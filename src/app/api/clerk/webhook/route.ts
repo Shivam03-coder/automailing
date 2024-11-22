@@ -4,7 +4,6 @@ import { db } from "@/server/db";
 
 export const POST = async (req: Request) => {
   const { data } = await req.json();
-  console.log("Clerk Data:", data);
 
   if (data) {
     const email = data.email_addresses[0].email_address;
