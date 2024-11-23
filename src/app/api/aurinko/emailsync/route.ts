@@ -31,7 +31,14 @@ export const POST = async (req: NextRequest) => {
 
     const response = await account.primaryEmailSyncFunc();
 
-    console.log(response.recordEmails);
+    if (!response) {
+      return NextResponse.json(
+        { error: "FAILED TO PERFORM SYNC" },
+        { status: 402 },
+      );
+    }
+
+    const { deltaToken, recordEmails } = response;
 
     return NextResponse.json(
       { success: true, data: response },

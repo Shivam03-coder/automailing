@@ -18,11 +18,136 @@ model User {
 }
 
 model Account {
-    id               String @id @default(cuid())
+    id               String            @id @default(cuid())
     userId           String
     accessToken      String
     name             String
     email            String
     latestDeltaToken String?
-    user             User   @relation(fields: [userId], references: [id])
+    user             User              @relation(fields: [userId], references: [id])
+    threads          UserEmailThread[]
+    emailAddresses   UserEmail[]
+    EmailAddress     EmailAddress[]
+}
+
+model UserEmailThread {
+    id                   String   @id @default(cuid())
+    emailsubject         String
+    emailLastmessageDate DateTime
+    participantIds       String[]
+    accountId            String
+    account              Account  @relation(fields: [accountId], references: [id])
+
+    emailstatus Boolean @default(false)
+
+    emailinboxStatus Boolean @default(true)
+    emaildraftStatus Boolean @default(false)
+    emailsentStatus  Boolean @default(false)
+
+    allEmails EmailAddress[]
+    UserEmail UserEmail[]
+
+    @@index([accountId])
+    @@index([emailstatus])
+    @@index([emailinboxStatus])
+    @@index([emaildraftStatus])
+    @@index([emailsentStatus])
+    @@index([emailLastmessageDate])
+}
+
+model UserEmail {
+    id                   String                @id @default(cuid())
+    threadId             String
+    thread               UserEmailThread       @relation(fields: [threadId], references: [id])
+    createdTime          DateTime
+    lastModifiedTime     DateTime
+    sentAt               DateTime
+    receivedAt           DateTime
+    internetMessageId    String
+    subject              String
+    sysLabels            String[]
+    keywords             String[]
+    sysClassifications   String[]
+    sensitivity          Sensitivity           @default(normal)
+    meetingMessageMethod MeetingMessageMethod?
+    from                 EmailAddress          @relation("FromEmail", fields: [fromId], references: [id])
+    fromId               String
+    to                   EmailAddress[]        @relation("ToEmails")
+    cc                   EmailAddress[]        @relation("CcEmails")
+    bcc                  EmailAddress[]        @relation("BccEmails")
+    replyTo              EmailAddress[]        @relation("ReplyToEmails")
+    hasAttachments       Boolean
+    body                 String?
+    bodySnippet          String?
+    attachments          EmailAttachment[]
+    inReplyTo            String?
+    references           String?
+    threadIndex          String?
+    internetHeaders      Json[]
+    nativeProperties     Json?
+    folderId             String?
+    omitted              String[]
+
+    emailLabel EmailLabel @default(inbox)
+    Account    Account?   @relation(fields: [accountId], references: [id])
+    accountId  String?
+
+    @@index([threadId])
+    @@index([emailLabel])
+    @@index([sentAt])
+}
+
+enum EmailLabel {
+    inbox
+    sent
+    draft
+}
+
+model EmailAddress {
+    id                String            @id @default(cuid())
+    name              String?
+    address           String
+    raw               String?
+    sentEmails        UserEmail[]       @relation("FromEmail")
+    receivedTo        UserEmail[]       @relation("ToEmails")
+    receivedCc        UserEmail[]       @relation("CcEmails")
+    receivedBcc       UserEmail[]       @relation("BccEmails")
+    replyToEmails     UserEmail[]       @relation("ReplyToEmails")
+    accountId         String
+    account           Account           @relation(fields: [accountId], references: [id])
+    UserEmailThread   UserEmailThread?  @relation(fields: [userEmailThreadId], references: [id])
+    userEmailThreadId String?
+    EmailAttachment   EmailAttachment[]
+
+    @@unique([accountId, address])
+}
+
+model EmailAttachment {
+    id              String       @id @default(cuid())
+    name            String
+    mimeType        String
+    size            Int
+    inline          Boolean
+    contentId       String?
+    content         String?
+    contentLocation String?
+    Email           EmailAddress @relation(fields: [emailId], references: [id])
+    emailId         String
+    UserEmail       UserEmail?   @relation(fields: [userEmailId], references: [id])
+    userEmailId     String?
+}
+
+enum Sensitivity {
+    normal
+    private
+    personal
+    confidential
+}
+
+enum MeetingMessageMethod {
+    request
+    reply
+    cancel
+    counter
+    other
 }

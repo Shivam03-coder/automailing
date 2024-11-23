@@ -77,9 +77,7 @@ export class Account {
       }
 
       if (!syncResponse.ready) {
-        throw new Error(
-          "Synchronization failed: Sync process not ready after maximum attempts",
-        );
+        throw new Error("SYNCRONIZATION_FAILED");
       }
 
       let storedDeltaToken = syncResponse.syncUpdatedToken;
@@ -91,7 +89,7 @@ export class Account {
 
       console.log(`Fetched ${recordEmails.length} emails from initial sync.`);
 
-      // Fetch all additional pages of updated emails
+      // Fetch all additional pages of updated emails and we will check upadted mails are there or not
       while (updatedResponse.nextPageToken) {
         console.log("Fetching next page of emails...");
         updatedResponse = await this.getUpdatedEmailsByBookmarkToken({
