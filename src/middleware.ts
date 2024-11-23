@@ -5,6 +5,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/clerk/webhook(.*)",
+  "/api(.*)",
 ]);
 
 // Middleware to handle route protection

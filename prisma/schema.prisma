@@ -9,7 +9,7 @@ datasource db {
 
 model User {
     id        String    @id @default(cuid())
-    email     String    @unique
+    email     String?
     firstName String
     lastName  String
     imageUrl  String
@@ -18,10 +18,11 @@ model User {
 }
 
 model Account {
-    id          String @id @default(cuid())
-    userId      String
-    accessToken String
-    name        String
-    email       String
-    user        User   @relation(fields: [userId], references: [id])
+    id               String @id @default(cuid())
+    userId           String
+    accessToken      String
+    name             String
+    email            String
+    latestDeltaToken String?
+    user             User   @relation(fields: [userId], references: [id])
 }

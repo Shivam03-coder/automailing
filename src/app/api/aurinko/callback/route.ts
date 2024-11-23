@@ -2,69 +2,94 @@ import { exchangecodeforAccessToken, getAccountDetails } from "@/lib/aurinko";
 import { db } from "@/server/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { date } from "zod";
+import axios from "axios";
+import { waitUntil } from "@vercel/functions";
 
 export const GET = async (req: NextRequest) => {
+  // Authenticate the user with Clerk
   const { userId } = await auth();
-  if (!userId)
+  if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
+  // Extract query parameters from the request
   const params = req.nextUrl.searchParams;
-
   const status = params.get("status");
 
-  if (status !== "success")
+  // Validate `status` and `code` parameters
+  if (status !== "success") {
     return NextResponse.json(
-      { message: "Unable to link your account" },
-      { status: 401 },
+      { message: "Unable to link your account. Status is not successful." },
+      { status: 400 },
     );
+  }
 
   const code = params.get("code");
 
-  if (!code)
-    return NextResponse.json({ message: "Code is not found" }, { status: 400 });
+  // Exchange the authorization code for access tokens
 
-  const tokens = await exchangecodeforAccessToken(code);
-
-  if (!tokens?.accessToken)
+  const tokens = await exchangecodeforAccessToken(code as string);
+  if (!tokens) {
     return NextResponse.json(
-      { message: "accessToken is not found" },
+      { message: "Failed to get token" },
       { status: 400 },
     );
-
-  const accountDetails = await getAccountDetails(tokens.accessToken);
-
-  if (!accountDetails)
-    return NextResponse.json(
-      { message: "accountDeatils is not found" },
-      { status: 400 },
-    );
-
-  if (
-    !tokens.accountId ||
-    !tokens.accessToken ||
-    !userId ||
-    !accountDetails?.email ||
-    !accountDetails?.name
-  ) {
-    throw new Error("Missing required fields");
   }
 
-  await db.account.upsert({
-    where: {
-      id: tokens.accountId.toString(),
-    },
-    update: {
-      accessToken: tokens.accessToken,
-    },
+  // Retrieve account details using the access token
+  const accountDetails = await getAccountDetails(tokens.accessToken);
+  if (!accountDetails) {
+    return NextResponse.json(
+      { message: "Account details could not be found." },
+      { status: 400 },
+    );
+  }
+
+  // Extract required fields from the response
+  const { accountId, accessToken } = tokens;
+  const { email, name } = accountDetails;
+
+  if (!accountId || !accessToken || !userId || !email || !name) {
+    throw new Error(
+      "Required fields are missing: accountId, accessToken, userId, email, or name.",
+    );
+  }
+
+  // Upsert account details into the database
+  const account = await db.account.upsert({
+    where: { id: accountId.toString() },
+    update: { accessToken },
     create: {
-      id: tokens.accountId.toString(),
+      id: accountId.toString(),
       userId,
-      email: accountDetails.email,
-      name: accountDetails.name,
-      accessToken: tokens.accessToken,
+      email,
+      name,
+      accessToken,
     },
   });
+  console.log("🚀 ~ GET ~ account:", account);
+
+  waitUntil(
+    axios
+      .post(
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/aurinko/emailsync`,
+        {
+          accountId: accountId.toString(),
+          userId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      }),
+  );
 
   return NextResponse.redirect(new URL("/mail", req.url), 301);
 };
