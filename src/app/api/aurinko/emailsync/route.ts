@@ -1,4 +1,4 @@
-import { Account } from "@/helpers";
+import { Account, syncTodataBase } from "@/helpers";
 import { db } from "@/server/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -39,6 +39,8 @@ export const POST = async (req: NextRequest) => {
     }
 
     const { deltaToken, recordEmails } = response;
+
+    await syncTodataBase(recordEmails, accountId);
 
     return NextResponse.json(
       { success: true, data: response },

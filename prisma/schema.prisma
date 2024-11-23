@@ -26,34 +26,35 @@ model Account {
     latestDeltaToken String?
     user             User              @relation(fields: [userId], references: [id])
     threads          UserEmailThread[]
-    emailAddresses   UserEmail[]
-    EmailAddress     EmailAddress[]
+    emailAddresses   EmailAddress[]
+    emails           UserEmail[]
 }
+
+// THREAD IS COLLECTION OF MESSAGES SENT 
 
 model UserEmailThread {
-    id                   String   @id @default(cuid())
-    emailsubject         String
-    emailLastmessageDate DateTime
+    id                   String         @id @default(cuid())
+    emailSubject         String
+    emailLastMessageDate DateTime
     participantIds       String[]
     accountId            String
-    account              Account  @relation(fields: [accountId], references: [id])
-
-    emailstatus Boolean @default(false)
-
-    emailinboxStatus Boolean @default(true)
-    emaildraftStatus Boolean @default(false)
-    emailsentStatus  Boolean @default(false)
-
-    allEmails EmailAddress[]
-    UserEmail UserEmail[]
+    account              Account        @relation(fields: [accountId], references: [id])
+    emailStatus          Boolean        @default(false)
+    emailInboxStatus     Boolean        @default(true)
+    emailDraftStatus     Boolean        @default(false)
+    emailSentStatus      Boolean        @default(false)
+    allEmails            EmailAddress[]
+    emails               UserEmail[]
 
     @@index([accountId])
-    @@index([emailstatus])
-    @@index([emailinboxStatus])
-    @@index([emaildraftStatus])
-    @@index([emailsentStatus])
-    @@index([emailLastmessageDate])
+    @@index([emailStatus])
+    @@index([emailInboxStatus])
+    @@index([emailDraftStatus])
+    @@index([emailSentStatus])
+    @@index([emailLastMessageDate])
 }
+
+// EMAILS 
 
 model UserEmail {
     id                   String                @id @default(cuid())
@@ -70,8 +71,8 @@ model UserEmail {
     sysClassifications   String[]
     sensitivity          Sensitivity           @default(normal)
     meetingMessageMethod MeetingMessageMethod?
-    from                 EmailAddress          @relation("FromEmail", fields: [fromId], references: [id])
     fromId               String
+    from                 EmailAddress          @relation("FromEmail", fields: [fromId], references: [id])
     to                   EmailAddress[]        @relation("ToEmails")
     cc                   EmailAddress[]        @relation("CcEmails")
     bcc                  EmailAddress[]        @relation("BccEmails")
@@ -87,10 +88,9 @@ model UserEmail {
     nativeProperties     Json?
     folderId             String?
     omitted              String[]
-
-    emailLabel EmailLabel @default(inbox)
-    Account    Account?   @relation(fields: [accountId], references: [id])
-    accountId  String?
+    emailLabel           EmailLabel            @default(inbox)
+    accountId            String?
+    account              Account?              @relation(fields: [accountId], references: [id])
 
     @@index([threadId])
     @@index([emailLabel])
@@ -115,9 +115,9 @@ model EmailAddress {
     replyToEmails     UserEmail[]       @relation("ReplyToEmails")
     accountId         String
     account           Account           @relation(fields: [accountId], references: [id])
-    UserEmailThread   UserEmailThread?  @relation(fields: [userEmailThreadId], references: [id])
     userEmailThreadId String?
-    EmailAttachment   EmailAttachment[]
+    userEmailThread   UserEmailThread?  @relation(fields: [userEmailThreadId], references: [id])
+    attachments       EmailAttachment[]
 
     @@unique([accountId, address])
 }
@@ -131,10 +131,10 @@ model EmailAttachment {
     contentId       String?
     content         String?
     contentLocation String?
-    Email           EmailAddress @relation(fields: [emailId], references: [id])
     emailId         String
-    UserEmail       UserEmail?   @relation(fields: [userEmailId], references: [id])
+    email           EmailAddress @relation(fields: [emailId], references: [id])
     userEmailId     String?
+    userEmail       UserEmail?   @relation(fields: [userEmailId], references: [id])
 }
 
 enum Sensitivity {
