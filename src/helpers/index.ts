@@ -123,106 +123,87 @@ export class Account {
   }
 }
 
-export const syncToDatabase = async (
-  allEmails: EmailRecord[],
-  accountId: string,
-): Promise<void> => {
-  const limit = PLimit(10);
-  try {
-    await Promise.all(
-      allEmails.map(
-        (email, i) => limit(() => saveEmails(email, accountId, i)), // Ensure controlled concurrency
-      ),
-    );
-    console.log("All emails synced successfully.");
-  } catch (error) {
-    console.error("Error syncing emails to database:", error);
-  }
-};
+// const saveEmails = async (email: EmailRecord, accountId: string, i: number) => {
+//   try {
+//     let emailLabelType: "inbox" | "sent" | "draft";
+//     if (
+//       email.sysLabels.includes("inbox") ||
+//       email.sysLabels.includes("important")
+//     ) {
+//       emailLabelType = "inbox";
+//     } else if (email.sysLabels.includes("sent")) {
+//       emailLabelType = "sent";
+//     } else if (email.sysLabels.includes("draft")) {
+//       emailLabelType = "draft";
+//     }
 
-const saveEmails = async (email: EmailRecord, accountId: string, i: number) => {
-  try {
-    let emailLabelType: "inbox" | "sent" | "draft";
-    if (
-      email.sysLabels.includes("inbox") ||
-      email.sysLabels.includes("important")
-    ) {
-      emailLabelType = "inbox";
-    } else if (email.sysLabels.includes("sent")) {
-      emailLabelType = "sent";
-    } else if (email.sysLabels.includes("draft")) {
-      emailLabelType = "draft";
-    }
+//     const addressesToupSert = new Map();
 
-    const addressesToupSert = new Map();
+//     for (const address of [
+//       email.from,
+//       ...email.to,
+//       ...email.cc,
+//       ...email.bcc,
+//       ...email.replyTo,
+//     ]) {
+//       addressesToupSert.set(address.address, address);
+//     }
 
-    for (const address of [
-      email.from,
-      ...email.to,
-      ...email.cc,
-      ...email.bcc,
-      ...email.replyTo,
-    ]) {
-      addressesToupSert.set(address.address, address);
-    }
+//     const upsertedAddresses: Awaited<ReturnType<typeof upsertEmailsAddress>>[] =
+//       [];
 
-    const upsertedAddresses: Awaited<ReturnType<typeof upsertEmailsAddress>>[] =
-      [];
+//     for (const address of addressesToupSert.values()) {
+//       const upsertedAddress = await upsertEmailsAddress(address, accountId);
+//       upsertedAddresses.push(upsertedAddress);
+//     }
 
-    for (const address of addressesToupSert.values()) {
-      const upsertedAddress = await upsertEmailsAddress(address, accountId);
-      upsertedAddresses.push(upsertedAddress);
-    }
+//     const addressMap = new Map(
+//       upsertedAddresses
+//         .filter(Boolean)
+//         .map((address) => [address?.address, address]),
+//     );
 
-    const addressMap = new Map(
-      upsertedAddresses
-        .filter(Boolean)
-        .map((address) => [address?.address, address]),
-    );
+//     const fromAddress = addressMap.get(email.from.address);
 
-    const fromAddress = addressMap.get(email.from.address);
+//     if (!fromAddress) {
+//       console.log("Failed to upsert the email address for", email.bodySnippet);
+//       return;
+//     }
 
-    if (!fromAddress) {
-      console.log("Failed to upsert the email address for", email.bodySnippet);
-      return;
-    }
+//   } catch (error) {
+//     console.log("error:", error);
+//   }
+// };
 
+// async function upsertEmailsAddress(address: EmailAddress, accountId: string) {
+//   try {
+//     const existingAddress = await db.emailAddress.findUnique({
+//       where: { id: accountId, address: address.address ?? "" },
+//     });
 
-    
-  } catch (error) {
-    console.log("error:", error);
-  }
-};
+//     if (existingAddress) {
+//       return await db.emailAddress.update({
+//         where: { id: existingAddress.id },
+//         data: {
+//           address: address.address ?? "",
+//           name: address.name,
+//           raw: address.raw,
+//           accountId,
+//         },
+//       });
+//     }
 
-async function upsertEmailsAddress(address: EmailAddress, accountId: string) {
-  try {
-    const existingAddress = await db.emailAddress.findUnique({
-      where: { id: accountId, address: address.address ?? "" },
-    });
-
-    if (existingAddress) {
-      return await db.emailAddress.update({
-        where: { id: existingAddress.id },
-        data: {
-          address: address.address ?? "",
-          name: address.name,
-          raw: address.raw,
-          accountId,
-        },
-      });
-    }
-
-    if (!existingAddress) {
-      return await db.emailAddress.create({
-        data: {
-          address: address.address ?? "",
-          name: address.name,
-          raw: address.raw,
-          accountId,
-        },
-      });
-    }
-  } catch (error) {
-    console.log("🚀 ~ upsertEmails ~ error:", error);
-  }
-}
+//     if (!existingAddress) {
+//       return await db.emailAddress.create({
+//         data: {
+//           address: address.address ?? "",
+//           name: address.name,
+//           raw: address.raw,
+//           accountId,
+//         },
+//       });
+//     }
+//   } catch (error) {
+//     console.log("🚀 ~ upsertEmails ~ error:", error);
+//   }
+// }

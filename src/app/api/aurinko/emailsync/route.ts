@@ -1,5 +1,6 @@
-import { Account, syncTodataBase } from "@/helpers";
+import { Account } from "@/helpers";
 import { db } from "@/server/db";
+import { SyncToDataBase } from "@/utils/database-sync";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
@@ -40,12 +41,18 @@ export const POST = async (req: NextRequest) => {
 
     const { deltaToken, recordEmails } = response;
 
-    await syncTodataBase(recordEmails, accountId);
+    await SyncToDataBase(recordEmails, accountId);
 
-    return NextResponse.json(
-      { success: true, data: response },
-      { status: 200 },
-    );
+    const updatedAccount = await db.account.update({
+      where: {
+        accessToken: UserAccount.accessToken,
+      },
+      data: {
+        latestDeltaToken: response.deltaToken,
+      },
+    });
+    console.log("sync complete", deltaToken);
+    return NextResponse.json({ success: true, deltaToken }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: "Internal Server Error" },

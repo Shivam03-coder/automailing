@@ -24,8 +24,8 @@ export interface EmailRecord {
   sysLabels: string[];
   keywords: string[];
   sysClassifications: string[];
-  sensitivity: "normal" | "confidential" | "high";
-  meetingMessageMethod: "request" | "response";
+  sensitivity: "normal" | "private" | "personal" | "confidential";
+  meetingMessageMethod?: "request" | "reply" | "cancel" | "counter" | "other";
   from: EmailAddress;
   to: EmailAddress[];
   cc: EmailAddress[];
