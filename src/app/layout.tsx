@@ -5,6 +5,7 @@ import { type Metadata } from "next";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCReactProvider } from "@/trpc/react";
+import AppWrapper from "./appwrapper";
 
 export const metadata: Metadata = {
   title: "Auto-Mailing-App",
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <ClerkProvider>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            <AppWrapper>{children}</AppWrapper>
+          </TRPCReactProvider>
         </ClerkProvider>
       </body>
     </html>
