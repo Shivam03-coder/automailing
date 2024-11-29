@@ -1,7 +1,7 @@
 import LinkAccountbtn from "@/components/linkaccountbtn";
 import { UserButton } from "@clerk/nextjs";
 
-export default async function Home() {
+export default function Home() {
   return (
     <h1>
       <UserButton />
@@ -9,3 +9,4 @@ export default async function Home() {
     </h1>
   );
 }
+// 
