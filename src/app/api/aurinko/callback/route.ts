@@ -91,5 +91,5 @@ export const GET = async (req: NextRequest) => {
       }),
   );
 
-  return NextResponse.redirect(new URL("/mail", req.url), 301);
+  return NextResponse.redirect(new URL("/mail-dashboard", req.url), 301);
 };

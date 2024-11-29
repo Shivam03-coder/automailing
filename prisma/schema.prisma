@@ -123,7 +123,7 @@ model EmailAddress {
 }
 
 model EmailAttachment {
-    id              String       @id @default(cuid())
+    id              String        @id @default(cuid())
     name            String
     mimeType        String
     size            Int
@@ -131,10 +131,10 @@ model EmailAttachment {
     contentId       String?
     content         String?
     contentLocation String?
+    Email           UserEmail     @relation(fields: [emailId], references: [id])
     emailId         String
-    email           EmailAddress @relation(fields: [emailId], references: [id])
-    userEmailId     String?
-    userEmail       UserEmail?   @relation(fields: [userEmailId], references: [id])
+    EmailAddress    EmailAddress? @relation(fields: [emailAddressId], references: [id])
+    emailAddressId  String?
 }
 
 enum Sensitivity {
