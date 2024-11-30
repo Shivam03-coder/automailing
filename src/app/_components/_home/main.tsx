@@ -1,3 +1,4 @@
+"use client";
 import HighlightCards from "@/components/shared/cards/highlightcard";
 import { MarqueeBox } from "@/components/shared/marquee/marqueebox";
 import { VideoModal } from "@/components/shared/modals/videomodals";
@@ -7,8 +8,11 @@ import { ArrowRight, Megaphone, Rocket } from "lucide-react";
 import React from "react";
 import PlanCards from "./payablecards.tsx";
 import FaqAccordion from "./faqsaccordion.tsx";
+import { useRouter } from "next/navigation";
 
 const MainLayout = () => {
+  const Router = useRouter();
+
   return (
     <main className="h-screen space-y-4">
       <BlurFade
@@ -43,7 +47,10 @@ const MainLayout = () => {
             solve it.
           </h4>
         </header>
-        <Button className="flex items-center gap-3 bg-primary font-inter font-medium text-secondary">
+        <Button
+          onClick={() => Router.push("/mail-dashboard")}
+          className="flex items-center gap-3 bg-primary font-inter font-medium text-secondary"
+        >
           <Rocket size={23} color="white" />
           Getting started for free
         </Button>
@@ -120,7 +127,6 @@ const MainLayout = () => {
           <FaqAccordion />
         </section>
       </section>
-
     </main>
   );
 };

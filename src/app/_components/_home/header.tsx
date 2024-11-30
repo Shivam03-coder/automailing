@@ -1,5 +1,4 @@
 "use client";
-import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
 import { NavigationMenuBar } from "@/components/ui/navigationmenu";
 import { Cuboid, Rocket } from "lucide-react";

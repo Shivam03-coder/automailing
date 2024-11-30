@@ -8,6 +8,7 @@ import { waitUntil } from "@vercel/functions";
 export const GET = async (req: NextRequest) => {
   // Authenticate the user with Clerk
   const { userId } = await auth();
+
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
