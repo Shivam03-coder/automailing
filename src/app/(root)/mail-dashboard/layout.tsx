@@ -26,10 +26,8 @@ const MailDashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    <h5>
-                      MIRAJ A NEW GENERATION AI BASED GMAIL MANAGEMNET SYSTEM
-                    </h5>
+                  <BreadcrumbLink href="/">
+                    <h5>HOME</h5>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
