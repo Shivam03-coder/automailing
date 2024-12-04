@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Cuboid } from "lucide-react";
+import { ChevronsUpDown, Cuboid, Mail, Plus } from "lucide-react";
 
 import {
   SidebarMenu,
@@ -9,18 +9,27 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
 
 export function TeamSwitcher() {
   const Router = useRouter();
+
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
+      <SidebarMenuItem className="space-y-4">
         <SidebarMenuButton
           onClick={() => Router.push("/")}
           size="lg"
           className="bg-primary text-secondary hover:bg-primary"
         >
-          <div className="flex aspect-square size-8  items-center justify-center rounded-lg">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
             <Cuboid className="!text-secondary" size={28} />
           </div>
           <div className="flex aspect-square size-8 w-full items-center gap-5 rounded-lg text-secondary">

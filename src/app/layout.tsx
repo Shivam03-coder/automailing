@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCReactProvider } from "@/trpc/react";
 import AppWrapper from "./appwrapper";
 import "@/styles/globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
       <body>
         <ClerkProvider>
           <TRPCReactProvider>
+            <Toaster />
             <AppWrapper>{children}</AppWrapper>
           </TRPCReactProvider>
         </ClerkProvider>
