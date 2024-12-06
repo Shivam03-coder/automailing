@@ -1,4 +1,4 @@
-import AccountSwitcher from "@/app/_components/_mail-dashboard/account-switcher";
+// import AccountSwitcher from "@/app/_components/_mail-dashboard/account-switcher";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -40,9 +40,7 @@ const MailDashboardLayout = ({ children }: { children: React.ReactNode }) => {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div>
-            <AccountSwitcher />
-          </div>
+          <div>{/* <AccountSwitcher /> */}</div>
         </header>
         {children}
       </SidebarInset>
