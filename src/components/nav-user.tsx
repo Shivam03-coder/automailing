@@ -38,7 +38,6 @@ export function NavUser() {
   useEffect(() => {
     const fetchUser = async () => {
       const userInfo = await GetUserInfo();
-      console.log("🚀 ~ fetchUser ~ userInfo:", userInfo);
       if (userInfo) {
         setUser({
           firstName: userInfo.username as string,

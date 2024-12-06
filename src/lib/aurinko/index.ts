@@ -19,10 +19,13 @@ export const getAurnikoAuthUrl = async (
     returnUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/aurinko/callback`,
   });
 
+  console.log(`https://api.aurinko.io/v1/auth/authorize?${params.toString()}`);
+
   return `https://api.aurinko.io/v1/auth/authorize?${params.toString()}`;
 };
 
 export const exchangecodeforAccessToken = async (code: string) => {
+  console.log("🚀 ~ exchangecodeforAccessToken ~ code:", code);
   try {
     const response = await Axios.post(
       `https://api.aurinko.io/v1/auth/token/${code}`,

@@ -8,11 +8,11 @@ import {
   Provider,
 } from "react-redux";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { applicationState } from "./states/globalstate";
 import { useRef } from "react";
+import { accountState } from "./states/accounts-state";
 
 const rootReducer = combineReducers({
-  global: applicationState.reducer,
+  account: accountState.reducer,
 });
 
 export const makeStore = () =>

@@ -28,7 +28,7 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    const account = new Account(UserAccount.accessToken);
+    const account = new Account(UserAccount.token);
 
     const response = await account.primaryEmailSyncFunc();
 
@@ -45,10 +45,10 @@ export const POST = async (req: NextRequest) => {
 
     const updatedAccount = await db.account.update({
       where: {
-        accessToken: UserAccount.accessToken,
+        token: UserAccount.token,
       },
       data: {
-        latestDeltaToken: response.deltaToken,
+        nextDeltaToken: response.deltaToken,
       },
     });
     console.log("sync complete", deltaToken);

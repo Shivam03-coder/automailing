@@ -98,15 +98,14 @@ const SaveEmailsInDb = async (
       .map((addr) => addressMap.get(addr.address))
       .filter(Boolean);
 
-    const thread = await db.userEmailThread.upsert({
-      where: {
-        id: email.threadId,
-      },
+    // 2. Upsert Thread
+    const thread = await db.thread.upsert({
+      where: { id: email.threadId },
       update: {
-        emailSubject: email.subject,
+        subject: email.subject,
         accountId,
-        emailLastMessageDate: new Date(email.sentAt),
-        emailSentStatus: false,
+        lastMessageDate: new Date(email.sentAt),
+        done: false,
         participantIds: [
           ...new Set([
             fromAddress.id,
@@ -119,12 +118,12 @@ const SaveEmailsInDb = async (
       create: {
         id: email.threadId,
         accountId,
-        emailSubject: email.subject,
-        emailStatus: false,
-        emailDraftStatus: emailLabelType === "draft",
-        emailInboxStatus: emailLabelType === "inbox",
-        emailSentStatus: emailLabelType === "sent",
-        emailLastMessageDate: new Date(email.sentAt),
+        subject: email.subject,
+        done: false,
+        draftStatus: emailLabelType === "draft",
+        inboxStatus: emailLabelType === "inbox",
+        sentStatus: emailLabelType === "sent",
+        lastMessageDate: new Date(email.sentAt),
         participantIds: [
           ...new Set([
             fromAddress.id,
@@ -138,7 +137,7 @@ const SaveEmailsInDb = async (
 
     // ============== EMAILS IN DB
 
-    await db.userEmail.upsert({
+    await db.email.upsert({
       where: { id: email.id },
       update: {
         threadId: thread.id,
@@ -203,7 +202,7 @@ const SaveEmailsInDb = async (
       },
     });
 
-    const threadEmails = await db.userEmail.findMany({
+    const threadEmails = await db.email.findMany({
       where: { threadId: thread.id },
       orderBy: { receivedAt: "asc" },
     });

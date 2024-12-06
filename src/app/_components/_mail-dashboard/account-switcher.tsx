@@ -7,16 +7,27 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { api } from "@/trpc/react";
 import { Mail, Plus } from "lucide-react";
+import { useLocalStorage } from "usehooks-ts";
 
 const AccountSwitcher = () => {
+  const { data: accounts } = api.mails.getAccounts.useQuery();
+
+  const [AccountId, set] = useLocalStorage("accountId", "");
+
+  if (!accounts) {
+    return null;
+  }
+
   const handleAccounts = (value: string) => {
     toast({
       title: `Account switched to ${value}`,
+      className: "bg-green-200 text-black",
     });
+    set(value); // Set the account ID in local storage
   };
 
   return (
@@ -36,7 +47,11 @@ const AccountSwitcher = () => {
           <SelectItem value="satyam013@gmail.com">
             satyam013@gmail.com
           </SelectItem>
-          <SelectItem value="jaya9439@gmail.com">jaya9439@gmail.com</SelectItem>
+          {accounts.map((acc) => (
+            <SelectItem key={acc.id} value={acc.id}>
+              {acc.emailAddress}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
